@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const path = require('path');
 
+const sauceRoutes = require('./routes/Sauce');
 const userRoutes = require('./routes/user');
 
 mongoose.connect('mongodb+srv://aicha_user:Afafa12345@cluster0.k6gp0jr.mongodb.net/test?retryWrites=true&w=majority',
@@ -10,6 +12,7 @@ mongoose.connect('mongodb+srv://aicha_user:Afafa12345@cluster0.k6gp0jr.mongodb.n
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
 const app = express();
+
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -19,27 +22,8 @@ app.use((req, res, next) => {
     next();
   });
 
-  app.use('/api/sauces', (req, res, next) => {
-    const sauce = [
-      {
-        _id: 'oeihfzeoi',
-        
-      },
-      {
-        _id: 'oeihfzeomoihi',
-       
-      },
-    ];
-    res.status(200).json(sauce);
-  });
-
-  app.post('/api/sauces', (req, res, next) => {
-    console.log(req.body);
-    res.status(201).json({
-      message: 'Objet créé !'
-    });
-  });
-
+app.use('/api/sauces', sauceRoutes);
 app.use('/api/auth', userRoutes);
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 module.exports = app;
