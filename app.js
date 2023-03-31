@@ -1,19 +1,31 @@
 const express = require('express');
+const cors = require('cors');
+require('dotenv').config()
+const mongoSanitize = require('express-mongo-sanitize')
 const mongoose = require('mongoose');
 const path = require('path');
+const helmet = require('helmet');//import helmet
 
 const sauceRoutes = require('./routes/Sauce');
-const userRoutes = require('./routes/user');
+const userRoutes = require('./routes/User');
+const limiter = require('./middleware/limiter');
 
-mongoose.connect('mongodb+srv://aicha_user:Afafa12345@cluster0.k6gp0jr.mongodb.net/test?retryWrites=true&w=majority',
+let aaa = 'mongodb+srv://aicha_user:Afafa12345@cluster0.k6gp0jr.mongodb.net/test?retryWrites=true&w=majority'
+
+mongoose.connect(process.env.URI_MongoDB,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
 const app = express();
-
+app.use(cors());
+app.use(helmet({
+  crossOriginResourcePolicy: false //modifiy middleware resource origin
+})); //use middleware helmet
+app.use(mongoSanitize());
 app.use(express.json());
+app.use(limiter);
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
